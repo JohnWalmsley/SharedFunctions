@@ -180,6 +180,10 @@ if model_type==35
     
 end
 
+if model_type==36||model_type==37
+    [M,H]=MexMH([0:0.1:ProtocolLength],IC,params); 
+end
+
 if model_type==26
     [X1,X2]=MexTenTusscher([0:0.1:ProtocolLength],IC,params);
     X=X1;
@@ -297,6 +301,18 @@ if model_type==2||model_type==27||model_type==13||model_type==19||model_type==5|
     
     I = params(length(params)).*X.*(V-Vr);
     O=X;
+    
+end
+if model_type==36
+    
+    I = params(length(params)).*M.*H.*(V-Vr);
+    O=M.*H;
+    
+end
+if model_type==37
+    
+    I = params(length(params)).*M.*(H.^2).*(V-Vr);
+    O=M.*(H.^2);
     
 end
 if model_type==12
