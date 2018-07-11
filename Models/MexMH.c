@@ -24,12 +24,13 @@
  * - YP_OUT is a vector containing the probability of being in the open state
  * at each time point */
 
-#define	YP_OUT	plhs[0]
+#define	M_OUT	plhs[0]
+#define	H_OUT	plhs[1]
 
 static int f(realtype t, N_Vector y, N_Vector ydot, void* pr0);
 
 /* Mex Function*/
-static void MexHHScaled(N_Vector ydot, realtype t, N_Vector y, double* pr, double* T, double* Y0, int M, double* yout) {
+static void MexMHScaled(N_Vector ydot, realtype t, N_Vector y, double* pr, double* T, double* Y0, int M, double* mout, double* hout) {
     
     int N=(M-1);
     
@@ -82,7 +83,8 @@ static void MexHHScaled(N_Vector ydot, realtype t, N_Vector y, double* pr, doubl
         }
       
         /*Probability of being in open state is equal to 1-probability of being in any other state*/
-        yout[k] = NV_Ith_S(y0, 2);
+        mout[k] = NV_Ith_S(y0, 1);
+        hout[k] = NV_Ith_S(y0, 2);
         
     }
     
@@ -631,34 +633,25 @@ v=pr[l+9];
 
 
     
-    /*Ensures microscopic reversibility condition satisfied*/
+    /*Get variables*/
   
-    const double y1 = NV_Ith_S(y, 0);
-    const double y2 = NV_Ith_S(y, 1);
-    const double y3 = NV_Ith_S(y, 2);
-
-    const double y4 = (1.0-y1-y2-y3); 
+    const double m = NV_Ith_S(y, 0);
+    const double h = NV_Ith_S(y, 1);
+    
     /* Model equations*/
     
-	
-	
-	        const double k32 = P4*exp(P5*v);
-	        const double k23 = P6*exp(-P7*v);
+      const double k1 = P0*exp(P1*v);
+	  const double k2 = P2*exp(-P3*v);
+      const double k3 = P4*exp(P5*v);
+	  const double k4 = P6*exp(-P7*v);
+     
+      const double m_inf = k1 / (k1 + k2 );
+      const double m_tau =  1 / (k1 + k2 );
+      const double h_inf = k4 / (k3 + k4 );
+      const double h_tau =  1 / (k3 + k4 );
 
-	        const double k43 = P0*exp(P1*v);
-	        const double k34 = P2*exp(-P3*v);
-	
-	        const double k12 = k43;
-	        const double k21 = k34;
-
- 		const double k41 = k32;
-	        const double k14 = k23;
-
-
-	        NV_Ith_S(ydot, 0) = -k12*y1 + k21*y2 + k41*y4 - k14*y1;
-	        NV_Ith_S(ydot, 1) = -k23*y2 + k32*y3 + k12*y1 - k21*y2;
-	        NV_Ith_S(ydot, 2) = -k34*y3 + k43*y4 + k23*y2 - k32*y3;
-	   
+	  NV_Ith_S(ydot, 0) = ( m - m_inf ) / m_tau;
+	  NV_Ith_S(ydot, 1) = ( h - h_inf ) / h_tau; 
  
     return 0;
 }
@@ -688,18 +681,21 @@ void mexFunction(int nlhs, mxArray *plhs[],
     double* Y0;
     Y0 = mxGetPr(prhs[1]);
     
-    double *yout;
+    double *mout;
+    double *hout;
     int Numvar;
     Numvar = mxGetN(Y_IN);
     
     /* Create a matrix for the return vector of open probabilities */
-    YP_OUT = mxCreateDoubleMatrix(M-1, 1, mxREAL);
+    M_OUT = mxCreateDoubleMatrix(M-1, 1, mxREAL);
+    H_OUT = mxCreateDoubleMatrix(M-1, 1, mxREAL);
     
     /* Assign pointer output */
-    yout = mxGetPr(YP_OUT);
+    mout = mxGetPr(M_OUT);
+    hout = mxGetPr(M_OUT);
     
     /* Mex function call */
-    MexHHScaled(ydot, t, y, pr, T, Y0, M, yout);
+    MexMHScaled(ydot, t, y, pr, T, Y0, M, mout, hout);
     return;
     
 }
