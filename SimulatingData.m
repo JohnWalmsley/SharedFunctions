@@ -15,6 +15,9 @@ end
 if model_type==13||model_type==19||model_type==10||model_type==11||model_type==15||model_type==30||model_type==24||model_type==35
     IC = [0.0,0.0,0.0];
 end
+if model_type==36||model_type==37
+    IC = [0.0,0.0];
+end
 if model_type==5
     IC = [1.0,0.0,0.0,0.0,0.0];
 end
