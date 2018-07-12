@@ -73,7 +73,6 @@ if strcmp(protocol,'inactivation')==1
     cd Protocols
     vv=importdata('inactivation_protocol.mat');
     cd ..
-    params
     temp_con = params(end);
     params = [params(1:end-1),vv',temp_con];
 end
@@ -184,7 +183,8 @@ if model_type==35
 end
 
 if model_type==36||model_type==37
-    [M,H]=MexMH([0:0.1:ProtocolLength],IC,params); 
+    [X1,X2]=MexMH([0:0.1:ProtocolLength],IC,params); 
+    X = [ X1, X2 ];
 end
 
 if model_type==26
@@ -308,14 +308,14 @@ if model_type==2||model_type==27||model_type==13||model_type==19||model_type==5|
 end
 if model_type==36
     
-    I = params(length(params)).*M.*H.*(V-Vr);
-    O=M.*H;
+    I = params(length(params)).*X1.*X2.*(V-Vr);
+    O=X1.*X2;
     
 end
 if model_type==37
     
-    I = params(length(params)).*M.*(H.^2).*(V-Vr);
-    O=M.*(H.^2);
+    I = params(length(params)).*X1.*(X2.^2).*(V-Vr);
+    O=X1.*(X2.^2);
     
 end
 if model_type==12
