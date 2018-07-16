@@ -1,4 +1,4 @@
-function [I, Y, S, dIdp, flux, time, G ] = SimulatingDataSens(protocol,params,V,temperature)
+function [I, Y, S, dIdp, flux, time, G ] = SimulatingDataSens(protocol,params,V,temperature, model_type)
 %--------------------------------------------------------------------------------------------------------------------------------------
 % In this function the initial conditions are identified for the model type and appropriate MexFunction for model is called (with model parameters
 % passed to MexFunction) to simulate current in response to specified protocol.
@@ -8,9 +8,11 @@ function [I, Y, S, dIdp, flux, time, G ] = SimulatingDataSens(protocol,params,V,
 T = 273.15+temperature;
 
 %Initial conditions for HH model
-
-IC = [0.0,0.0,0.0];
-
+if model_type == 35
+    IC = [ 0.0, 0.0, 0.0 ];
+elseif model_type==36||model_type==37
+    IC = [ 0.0, 0.0 ];
+end
 %-----------------------------------------------------------------------------------------------------------------------------------------%
 % Defines protocol number and protocol length (ms) for each protocol
 %-----------------------------------------------------------------------------------------------------------------------------------------%
@@ -134,12 +136,17 @@ params = [protocol_number,params];
 % sensitivity initial condition is based on the steady state for the voltage at the first time
 % point in the protocol
 
-A_V = CalculateJacobianMatrix( vv(1), params );
-k_V = CalculateSensitivityRhsVectors( vv(1), IC', params );
+A_V = CalculateJacobianMatrix( vv(1), params, model_type );
+k_V = CalculateSensitivityRhsVectors( vv(1), IC', params, model_type );
 s_star = -inv(A_V)*k_V;
-s_star = [ s_star(1,:) s_star(2,:) s_star(3,:) ]; % Unpack into row vector
+s_starT = s_star';
+s_star_row = s_starT( : )'; % Unpack into row vector - works in all cases
 time = 0:0.1:ProtocolLength;
-[ Y, S, flux ] = MexHHSens( time, IC, params, s_star );
+if model_type == 35
+    [ Y, S, flux ] = MexHHSens( time, IC, params, s_star_row );
+elseif model_type == 26 || model_type == 37
+    [ Y, S, flux ] = MexMHSens( time, IC, params, s_star_row );
+end
 
 %Calculates reversal potential using Nernst equation to be used in current calculation equation. Temperature, extracellular and intracellular potassium concentration correspond to those used in experiment.
 
@@ -152,9 +159,7 @@ k_o = 4;
 erev = ((R*T)/F)*log(k_o/K_i);
 
 O = ones(length(Y(:,1)),1);
-
 Vr = O.*erev;
-
 %-----------------------------------------------------------------------------------------------------------------------------------------%
 
 % Current calculations.
@@ -167,7 +172,27 @@ Vr = O.*erev;
 %                         I =  g*Xr*Rr*(V-Vr)
 % so for model for which the output of the Mex function X represents Xr*Rr,
 % the current can be expressed in the same way as for the Markov model formulations.
+params( 2 : 9 ) 
+params( end )
 G = params( length( params ) );
-I = G.*Y(:,3).*(V-Vr);
-dIdp = params(length(params))*bsxfun( @times,S(:,17:24),(V-Vr));
+if model_type == 35
+    I = G.*Y(:,3).*(V-Vr);
+    dIdp = G*bsxfun( @times,S(:,17:24),(V-Vr));
+elseif model_type == 36
+    m = Y(:,1);
+    h = Y(:,2);
+    I = G.*m.*h.*(V-Vr);
+    dmdp = S( :, 1 : 8 );
+    dhdp = S( :, 9 : 16 );
+    dmhdp = bsxfun( @times, dmdp, h ) + bsxfun( @times, m, dhdp );
+    dIdp = G*bsxfun( @times,dmhdp,(V-Vr));
+elseif model_type == 37
+    m = Y(:,1);
+    h = Y(:,2);
+    I = G.*m.*(h.^2).*(V-Vr);
+    dmdp = S( :, 1 : 8 );
+    dhdp = S( :, 9 : 16 );
+    dmh2dp = bsxfun( @times, dmdp, h.^2 ) + 2 * bsxfun( @times, m.*h, dhdp );
+    dIdp = G*bsxfun( @times,dmh2dp,(V-Vr));
+end
 time = time(2:end)';
