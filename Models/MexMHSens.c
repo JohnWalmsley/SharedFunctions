@@ -50,7 +50,7 @@ static void MexHHScaled(N_Vector ydot, realtype t, N_Vector y, double* pr, doubl
     realtype T0 =T[0];
     int numSens = 8;
     int is;
-    int numFlux = 8;
+    int numFlux = 4;
              
     realtype Tfinal = ((M-1)*((T[1])-(T[0])));
     //realtype* realPr = pr;
@@ -71,10 +71,9 @@ static void MexHHScaled(N_Vector ydot, realtype t, N_Vector y, double* pr, doubl
     N_Vector *yS;
     yS = NULL;
     void* cvode_mem = NULL;
-    y0 = N_VNew_Serial(3);
+    y0 = N_VNew_Serial(2);
     NV_Ith_S(y0, 0) = Y0[0];
     NV_Ith_S(y0, 1) = Y0[1];
-    NV_Ith_S(y0, 2) = Y0[2];
         
     realtype NState = 3;
     /* Solver options*/
@@ -106,7 +105,6 @@ static void MexHHScaled(N_Vector ydot, realtype t, N_Vector y, double* pr, doubl
     for (is=0;is<numSens;is++){ 
         NV_Ith_S(yS[is], 0) = S0[is];
         NV_Ith_S(yS[is], 1) = S0[is + numSens];
-        NV_Ith_S(yS[is], 2) = S0[is + 2*numSens];
     };
         
     flag = CVodeSensInit1(cvode_mem, numSens, CV_SIMULTANEOUS, fS, yS);
@@ -132,7 +130,6 @@ static void MexHHScaled(N_Vector ydot, realtype t, N_Vector y, double* pr, doubl
         /*All states are required to calculate fluxes*/
         yout[k]     = NV_Ith_S(y0, 0);
         yout[k+N]   = NV_Ith_S(y0, 1);
-        yout[k+2*N] = NV_Ith_S(y0, 2); // Note: open probability is now the third column
         
         calculate_flux( flux, tout, pr, y0 );
                             
@@ -147,11 +144,9 @@ static void MexHHScaled(N_Vector ydot, realtype t, N_Vector y, double* pr, doubl
             
             sens_data = NV_DATA_S(yS[kp]);
             idx = k + kp * N;
-            sout[idx] = sens_data[0]; // enter sensitivity to parameter P_kp for y0 into first block
+            sout[idx] = sens_data[0]; // enter sensitivity to parameter P_kp for m into first block
             idx += numSens*N;
-            sout[idx] = sens_data[1]; // enter sensitivity to parameter P_kp for y1 into second block 
-            idx += numSens*N;
-            sout[idx] = sens_data[2]; // enter sensitivity to parameter P_kp for y2 into third block 
+            sout[idx] = sens_data[1]; // enter sensitivity to parameter P_kp for h into second block 
   
             }
     }
@@ -182,33 +177,26 @@ static int f(realtype t, N_Vector y, N_Vector ydot, void* pr0) {
     realtype P5 = pr[6];
     realtype P6 = pr[7];
     realtype P7 = pr[8];
+       
+   /*Get variables*/
     
-    /*Ensures microscopic reversibility condition satisfied*/
+    realtype m = NV_Ith_S(y, 0);
+    realtype h = NV_Ith_S(y, 1);
     
-    realtype y1 = NV_Ith_S(y, 0);
-    realtype y2 = NV_Ith_S(y, 1);
-    realtype y3 = NV_Ith_S(y, 2);
-    
-    realtype y4 = (1.0-y1-y2-y3);
- 
     /* Model equations*/
     
-    realtype k32 = P4*exp(P5*v);
-    realtype k23 = P6*exp(-P7*v);
+    realtype k1 = P0*exp(P1*v);
+    realtype k2 = P2*exp(-P3*v);
+    realtype k3 = P4*exp(P5*v);
+    realtype k4 = P6*exp(-P7*v);
     
-    realtype k43 = P0*exp(P1*v);
-    realtype k34 = P2*exp(-P3*v);
-    
-    realtype k12 = k43;
-    realtype k21 = k34;
-    
-    realtype k41 = k32;
-    realtype k14 = k23;
-    
-    NV_Ith_S(ydot, 0) = -k12*y1 + k21*y2 + k41*y4 - k14*y1;
-    NV_Ith_S(ydot, 1) = -k23*y2 + k32*y3 + k12*y1 - k21*y2;
-    NV_Ith_S(ydot, 2) = -k34*y3 + k43*y4 + k23*y2 - k32*y3;
-    
+    realtype m_inf = k1 / ( k1 + k2 );
+    realtype m_tau =  1 / ( k1 + k2 );
+    realtype h_inf = k4 / ( k3 + k4 );
+    realtype h_tau =  1 / ( k3 + k4 );
+        
+    NV_Ith_S(ydot, 0) = ( m_inf - m) / m_tau;
+    NV_Ith_S(ydot, 1) = ( h_inf - h ) / h_tau;
     
     return 0;
 }
@@ -279,76 +267,52 @@ static int fS(int Ns, realtype t, N_Vector y, N_Vector ydot,
   realtype P6 = pr[7];
   realtype P7 = pr[8];
   
-  realtype k32 = P4*exp(P5*v);
-  realtype k23 = P6*exp(-P7*v);
-    
-  realtype k43 = P0*exp(P1*v);
-  realtype k34 = P2*exp(-P3*v);
-    
-  realtype k12 = k43;
-  realtype k21 = k34;
-    
-  realtype k41 = k32;
-  realtype k14 = k23;
-  
-  realtype s1, s2, s3;
-  realtype sd1, sd2, sd3;
+  realtype k1 = P0*exp(P1*v);
+  realtype k2 = P2*exp(-P3*v);
+  realtype k3 = P4*exp(P5*v);
+  realtype k4 = P6*exp(-P7*v);
+      
+  realtype s1, s2;
+  realtype sd1, sd2;
 
-  realtype y1, y2, y3, y4;
-  y1 = NV_Ith_S(y,0);  y2 = NV_Ith_S(y,1);  y3 = NV_Ith_S(y,2);
-  y4 = 1 - y1 - y2 - y3;
-  s1 = NV_Ith_S(yS,0); s2 = NV_Ith_S(yS,1); s3 = NV_Ith_S(yS,2);
+  realtype m, h;
+  m = NV_Ith_S(y,0);  
+  h = NV_Ith_S(y,1);  
+  s1 = NV_Ith_S(yS,0); 
+  s2 = NV_Ith_S(yS,1);
 
-  sd1 = ( - ( k12 + k14 ) - k41 ) * s1 + ( k21 - k41 ) * s2 + ( -k41 ) * s3;
-  sd2 = k12 * s1 + ( - ( k23 + k21 ) ) * s2 + ( k32 ) * s3;
-  sd3 = - k43 * s1 + (k23-k43) * s2 + ( -( k34 + k32 ) - k43 ) * s3;
+  sd1 = -( k1 + k2 ) * s1;
+  sd2 = -( k3 + k4 ) * s2;
   
   switch (iS) {
   case 0:
-    sd1 += -exp(P1*v)*y1;
-    sd2 +=  exp(P1*v)*y1;
-    sd3 +=  exp(P1*v)*y4;
+    sd1 += ( 1 - m ) * exp( P1 * v );
     break;
   case 1:
-    sd1 += -v*k12*y1;
-    sd2 +=  v*k12*y1;
-    sd3 +=  v*k43*y4;
+    sd1 += ( 1 - m ) * v * k1;
     break;
   case 2:
-    sd1 +=  exp(-P3*v)*y2;
-    sd2 += -exp(-P3*v)*y2;
-    sd3 += -exp(-P3*v)*y3;
+    sd1 += -m * exp( -P3 * v );
     break;
   case 3:
-    sd1 += -v*k21*y2;
-    sd2 +=  v*k21*y2;
-    sd3 +=  v*k34*y3;
+    sd1 += m * v * k2;
     break;
   case 4:
-    sd1 +=  exp(P5*v)*y4;
-    sd2 +=  exp(P5*v)*y3;
-    sd3 += -exp(P5*v)*y3;
+    sd2 += ( 1 - h ) * exp( P5 * v ); 
     break;
   case 5:
-    sd1 +=  v*k41*y4;
-    sd2 +=  v*k32*y3;
-    sd3 += -v*k32*y3;
+    sd2 += ( 1 - h ) * v * k3;
     break;
   case 6:
-    sd1 +=  exp(-P7*v)*y1;
-    sd2 += -exp(-P7*v)*y2;
-    sd3 +=  exp(-P7*v)*y2;
+    sd2 += -h * exp( -P7 * v );
     break;
   case 7:
-    sd1 +=  v*k14*y1;
-    sd2 +=  v*k23*y2;
-    sd3 += -v*k23*y2;
+    sd2 += h * v * k4;
     break;
   }
   
   NV_Ith_S(ySdot,0) = sd1;
   NV_Ith_S(ySdot,1) = sd2;
-  NV_Ith_S(ySdot,2) = sd3;
 
   return 0;
 }
@@ -368,43 +332,29 @@ static int calculate_flux( double* flux, realtype t, realtype *pr, N_Vector y )
   realtype P5 = pr[6];
   realtype P6 = pr[7];
   realtype P7 = pr[8];
-  
-  realtype k32 = P4*exp(P5*v);
-  realtype k23 = P6*exp(-P7*v);
+     
+  realtype k1 = P0*exp(P1*v);
+  realtype k2 = P2*exp(-P3*v);
+  realtype k3 = P4*exp(P5*v);
+  realtype k4 = P6*exp(-P7*v);
     
-  realtype k43 = P0*exp(P1*v);
-  realtype k34 = P2*exp(-P3*v);
-    
-  realtype k12 = k43;
-  realtype k21 = k34;
-    
-  realtype k41 = k32;
-  realtype k14 = k23;
+  realtype m, h;
+  m = NV_Ith_S(y,0);  
+  h = NV_Ith_S(y,1);
 
-  realtype y1, y2, y3, y4;
-  y1 = NV_Ith_S(y,0);  y2 = NV_Ith_S(y,1);  y3 = NV_Ith_S(y,2);
-  y4 = 1 - y1 - y2 - y3;
-
-  /* order of fluxes is a little difficult to relate to the parameters or the variables!
-   *    Logic for fluxes:
-   *    Kylie used y0[2] = y3 as O in the original MexHH.c
-   *    Therefore, y3 is O
-   *    Fluxes k34 and k32 leaving O go to I and C, so these are y4 and y2
-   *    k34 has negative exponent (Pa exp(-pb V), so y4 is C
-   *    Therefore I is y2 and IC is y1
-   *    ... I think
+  /* order of fluxes 
+   * in this implementation ,the variable h can be raised to multiple powers, therefore represents closure/opening
+   * m is therefore P(active).
+   * Note that if raised to multiple powers, open/closed rates can be scaled b factor 2, 3, ... depending on closed state
+   * This is irrelevant for regression purposes as this is a linear combination.
    */ 
   
   // Order: y1 y2 y3 y4
   
-  flux[0] = k12*y1; //IC->I
-  flux[1] = k14*y1; //IC->C
-  flux[2] = k21*y2; // I->IC 
-  flux[3] = k23*y2; // I->O
-  flux[4] = k32*y3; // O->I
-  flux[5] = k34*y3; // O->C
-  flux[6] = k41*y4; // C->IC
-  flux[7] = k43*y4; // C->O
+  flux[0] = k1 * ( 1 - m ); //inactive -> active
+  flux[1] = k2 * m;         // active -> inactive
+  flux[2] = k3 * ( 1 - h ); // closed -> open
+  flux[3] = k4 * h;         // open -> closed
     
   return 0;
 }
