@@ -4,7 +4,7 @@ function [ variables, I, rates, fluxes, sensitivity, dIdp, voltage, dVdt, time, 
 
 % Identifies temperature for appropriate experiment
 if nargin < 3
-    fitting_protocol = 'sine_wave';
+    fitting_protocol = { 'sine_wave' };
 end
 if nargin < 4
     model = 'hh';
