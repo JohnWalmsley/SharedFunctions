@@ -38,7 +38,7 @@ if model_type == 35
     
     rhsVectors = [c1 c2 c3 c4 c5 c6 c7 c8 ];
 
-elseif model_type == 36 || model_type == 37
+elseif any( model_type == [ 36 37 38 39 40 ] )
     
     m = y( 1 );
     h = y( 2 );

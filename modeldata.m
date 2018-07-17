@@ -226,4 +226,25 @@ if strcmp(model,'mh2')==1
     cd ..
 end
 
+if strcmp(model,'mh3')==1
+    cd ParameterSets/
+    simulated_parameters=importdata('HHModelSimulatedParameters.mat');
+    model_type = 38;
+    cd ..
+end
+
+if strcmp(model,'mh4')==1
+    cd ParameterSets/
+    simulated_parameters=importdata('HHModelSimulatedParameters.mat');
+    model_type = 39;
+    cd ..
+end
+
+if strcmp(model,'m2h2')==1
+    cd ParameterSets/
+    simulated_parameters=importdata('HHModelSimulatedParameters.mat');
+    model_type = 40;
+    cd ..
+end
+
 cd Code

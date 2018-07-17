@@ -144,7 +144,7 @@ s_star_row = s_starT( : )'; % Unpack into row vector - works in all cases
 time = 0:0.1:ProtocolLength;
 if model_type == 35
     [ Y, S, flux ] = MexHHSens( time, IC, params, s_star_row );
-elseif model_type == 26 || model_type == 37
+elseif any( model_type == [ 36 37 38 39 40 ] )
     [ Y, S, flux ] = MexMHSens( time, IC, params, s_star_row );
 end
 
@@ -194,5 +194,29 @@ elseif model_type == 37
     dhdp = S( :, 9 : 16 );
     dmh2dp = bsxfun( @times, dmdp, h.^2 ) + 2 * bsxfun( @times, m.*h, dhdp );
     dIdp = G*bsxfun( @times,dmh2dp,(V-Vr));
+elseif model_type == 38
+    m = Y(:,1);
+    h = Y(:,2);
+    I = G.*m.*(h.^3).*(V-Vr);
+    dmdp = S( :, 1 : 8 );
+    dhdp = S( :, 9 : 16 );
+    dmh3dp = bsxfun( @times, dmdp, h.^3 ) + 3 * bsxfun( @times, m.*(h.^2), dhdp );
+    dIdp = G*bsxfun( @times,dmh3dp,(V-Vr));
+elseif model_type == 39
+    m = Y(:,1);
+    h = Y(:,2);
+    I = G.*m.*(h.^4).*(V-Vr);
+    dmdp = S( :, 1 : 8 );
+    dhdp = S( :, 9 : 16 );
+    dmh4dp = bsxfun( @times, dmdp, h.^4 ) + 4 * bsxfun( @times, m.*(h.^3), dhdp );
+    dIdp = G*bsxfun( @times,dmh4dp,(V-Vr));
+elseif model_type == 40
+    m = Y(:,1);
+    h = Y(:,2);
+    I = G.*(m.^2).*(h.^2).*(V-Vr);
+    dmdp = S( :, 1 : 8 );
+    dhdp = S( :, 9 : 16 );
+    dm2h2dp = 2 * bsxfun( @times, dmdp, m.*(h.^2) ) + 2 * bsxfun( @times, (m.^2).*h, dhdp );
+    dIdp = G*bsxfun( @times,dm2h2dp,(V-Vr));
 end
 time = time(2:end)';

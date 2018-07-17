@@ -15,7 +15,7 @@ end
 if model_type==13||model_type==19||model_type==10||model_type==11||model_type==15||model_type==30||model_type==24||model_type==35
     IC = [0.0,0.0,0.0];
 end
-if model_type==36||model_type==37
+if any( model_type == [ 36 37 38 39 40 ] )  
     IC = [0.0,0.0];
 end
 if model_type==5
@@ -182,7 +182,7 @@ if model_type==35
     
 end
 
-if model_type==36||model_type==37
+if any( model_type == [ 36 37 38 39 40 ] )
     [X1,X2]=MexMH([0:0.1:ProtocolLength],IC,params); 
     X = [ X1, X2 ];
 end
@@ -317,6 +317,24 @@ if model_type==37
     I = params(length(params)).*X1.*(X2.^2).*(V-Vr);
     O=X1.*(X2.^2);
     
+end
+if model_type==38
+    
+    I = params(length(params)).*X1.*(X2.^3).*(V-Vr);
+    O=X1.*(X2.^3);
+    
+end
+if model_type==39
+    
+    I = params(length(params)).*X1.*(X2.^4).*(V-Vr);
+    O=X1.*(X2.^4);
+    
+end
+if model_type==40
+    
+    I = params(length(params)).*(X1.^2).*(X2.^2).*(V-Vr);
+    
+    O=(X1.^2).*(X2.^2);
 end
 if model_type==12
     
