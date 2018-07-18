@@ -10,7 +10,7 @@ T = 273.15+temperature;
 %Initial conditions for HH model
 if model_type == 35
     IC = [ 0.0, 0.0, 0.0 ];
-elseif model_type==36||model_type==37
+elseif any( model_type == [ 36 37 38 39 40 ] )
     IC = [ 0.0, 0.0 ];
 end
 %-----------------------------------------------------------------------------------------------------------------------------------------%
