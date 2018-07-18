@@ -2,7 +2,7 @@ function idx = GetNoSpikeIdx( protocol, end_idx )
 %GETNOSPIKEIDX Summary of this function goes here
 %   Detailed explanation goes here
 
-if strcmp( protocol, 'sine_wave' )
+if strcmp( protocol, 'sine_wave' )||strcmp( protocol, 'sine_wave_hh' )
     idx = [ 1:2499 2549:2999 3049:4999 5049:14999 15049:19999 20049:29999 30049:64999 65049:69999 70049:end_idx];
 elseif strcmp( protocol, 'ap' )
     idx = [1:2499,2549:2999 3049:5699,5749:7199,7249:10559,10609:17689,17739:20719,20769:24245,24295:28097,...

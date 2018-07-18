@@ -19,7 +19,7 @@ end
 cd ..
 % For non-sine wave protocol the protocol is also passed as additional parameters, avoiding detailed protocol description in Mex function
 ProtocolLength = (length(V)/10);
-if strcmp(protocol,'sine_wave')==1
+if strcmp(protocol,'sine_wave')==1||strcmp(protocol,'sine_wave_hh')==1
     vv = -80; % First voltage for sensitivity initial conditions
     protocol_number=1;
 end
