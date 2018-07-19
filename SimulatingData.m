@@ -314,20 +314,20 @@ if model_type==36
 end
 if model_type==37
     
-    I = params(length(params)).*X1.*(X2.^2).*(V-Vr);
-    O=X1.*(X2.^2);
+    I = params(length(params)).*(X1.^2).*X2.*(V-Vr);
+    O=(X1.^2).*X2;
     
 end
 if model_type==38
     
-    I = params(length(params)).*X1.*(X2.^3).*(V-Vr);
-    O=X1.*(X2.^3);
+    I = params(length(params)).*(X1.^3).*X2.*(V-Vr);
+    O=(X1.^3).*X2;
     
 end
 if model_type==39
     
-    I = params(length(params)).*X1.*(X2.^4).*(V-Vr);
-    O=X1.*(X2.^4);
+    I = params(length(params)).*(X1.^4).*X2.*(V-Vr);
+    O=(X1.^4).*X2;
     
 end
 if model_type==40

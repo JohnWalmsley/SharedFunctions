@@ -219,21 +219,21 @@ if strcmp(model,'mh')==1
     cd ..
 end
 
-if strcmp(model,'mh2')==1
+if strcmp(model,'m2h')==1
     cd ParameterSets/
     simulated_parameters=importdata('HHModelSimulatedParameters.mat');
     model_type = 37;
     cd ..
 end
 
-if strcmp(model,'mh3')==1
+if strcmp(model,'m3h')==1
     cd ParameterSets/
     simulated_parameters=importdata('HHModelSimulatedParameters.mat');
     model_type = 38;
     cd ..
 end
 
-if strcmp(model,'mh4')==1
+if strcmp(model,'m4h')==1
     cd ParameterSets/
     simulated_parameters=importdata('HHModelSimulatedParameters.mat');
     model_type = 39;

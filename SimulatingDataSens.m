@@ -189,27 +189,27 @@ elseif model_type == 36
 elseif model_type == 37
     m = Y(:,1);
     h = Y(:,2);
-    I = G.*m.*(h.^2).*(V-Vr);
+    I = G.*(m.^2).*h.*(V-Vr);
     dmdp = S( :, 1 : 8 );
     dhdp = S( :, 9 : 16 );
-    dmh2dp = bsxfun( @times, dmdp, h.^2 ) + 2 * bsxfun( @times, m.*h, dhdp );
-    dIdp = G*bsxfun( @times,dmh2dp,(V-Vr));
+    dm2hdp = 2 * bsxfun( @times, dmdp, m.*h ) + bsxfun( @times, m, dhdp );
+    dIdp = G*bsxfun( @times,dm2hdp,(V-Vr));
 elseif model_type == 38
     m = Y(:,1);
     h = Y(:,2);
-    I = G.*m.*(h.^3).*(V-Vr);
+    I = G.*(m.^3).*h.*(V-Vr);
     dmdp = S( :, 1 : 8 );
     dhdp = S( :, 9 : 16 );
-    dmh3dp = bsxfun( @times, dmdp, h.^3 ) + 3 * bsxfun( @times, m.*(h.^2), dhdp );
-    dIdp = G*bsxfun( @times,dmh3dp,(V-Vr));
+    dm3hdp = 3 * bsxfun( @times, dmdp, (m.^2).*h ) + bsxfun( @times, m.^3, dhdp );
+    dIdp = G*bsxfun( @times,dm3hdp,(V-Vr));
 elseif model_type == 39
     m = Y(:,1);
     h = Y(:,2);
-    I = G.*m.*(h.^4).*(V-Vr);
+    I = G.*(m.^4).*h.*(V-Vr);
     dmdp = S( :, 1 : 8 );
     dhdp = S( :, 9 : 16 );
-    dmh4dp = bsxfun( @times, dmdp, h.^4 ) + 4 * bsxfun( @times, m.*(h.^3), dhdp );
-    dIdp = G*bsxfun( @times,dmh4dp,(V-Vr));
+    dm4hdp = 4*bsxfun( @times, dmdp, (m.^3).*h ) + bsxfun( @times, m.^4, dhdp );
+    dIdp = G*bsxfun( @times,dm4hdp,(V-Vr));
 elseif model_type == 40
     m = Y(:,1);
     h = Y(:,2);
