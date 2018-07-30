@@ -86,8 +86,6 @@ These variables are used for predicting discrepancy in [DiscrepancyCorrelations]
 
 [FindingBestFitsAfterMCMC.m](FindingBestFitsAfterMCMC.m): Given a model (string), protocol or set of protocols (cell or string), and cell identifier, returns the MCMC chain and likelihood values for an [MCMC](https://github.com/JohnWalmsley/FittingAlgorithm/blob/master/Code/AdaptiveMCMCStartingBestCMAES.m) run.
 
-[CalculateJacobianMatrix.m](CalculatingJacobianMatrix.m): Given a voltage, model parameters, and a model type identifier from [modeldata.m](modeldata.m), calculates the Jacobian of an HH or an mh model.
-
 [SimulatingData.m](SimulatingData.m): Runs a simulation directly using the CVODE version of any model in the project. Note that, because voltage is clamped, open probabilities for models of the form m^k.h are generated from the output of [MexMH.c](Models/MexMH.c).
 
 [SimulatingDataSens.m](SimulatingDataSens.m): Runs a simulation directly using the CVODES version of the HH or MH model in the project. Note that, because voltage is clamped, open probabilities for models of the form m^k.h are generated from the output of [MexMHSens.c](Models/MexMHSens.c). Sensitivities for the current in these models is calculated using the chain rule. Called by [CalculatingVariables.m](CalculatingVariables.m).
