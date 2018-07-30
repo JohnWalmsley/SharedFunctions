@@ -12,6 +12,10 @@ end
 
 temperature = GetTemperature( exp_ref );
 
+if ~isa( fitting_protocol, 'cell' )
+    fitting_protocol={fitting_protocol};
+end
+
 % Identifies best fitting parameters to sine wave from Kylie's work
 [chain,likelihood] = FindingBestFitsAfterMCMC( model, fitting_protocol, exp_ref);
 [~,v]= max(likelihood);
