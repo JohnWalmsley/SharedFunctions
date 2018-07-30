@@ -1,6 +1,6 @@
 # Shared functions for discrepancy analysis
 
-This folder contains files common to different projects in the Discrepancy Analysis projects to avoid duplication. Many of these files have been adapted from the sine-wave repository provided by [Beattie et al](https://physoc.onlinelibrary.wiley.com/doi/abs/10.1113/JP275733). To use the code in the projects [DiscrepancyCorrelations](https://github.com/JohnWalmsley/DiscrepancyCorrelations) and [FittingAlgorithm](https://github.com/JohnWalmsley/FittingAlgorithm), you will need to add this folder and its subfolder to the Matlab path.
+This folder contains files common to different projects in the Discrepancy Analysis projects to avoid duplication. Many of these files have been adapted from the [sine-wave repository](https://github.com/mirams/sine-wave) provided by [Beattie et al](https://physoc.onlinelibrary.wiley.com/doi/abs/10.1113/JP275733). To use the code in the projects [DiscrepancyCorrelations](https://github.com/JohnWalmsley/DiscrepancyCorrelations) and [FittingAlgorithm](https://github.com/JohnWalmsley/FittingAlgorithm), you will need to add this folder and its subfolder to the Matlab path.
 
 ## Models
 
