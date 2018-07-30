@@ -24,6 +24,13 @@ if strcmp(model,'wang')==1
     cd ..
 end
 
+if strcmp(model,'wangsw')==1
+    cd ParameterSets/
+    simulated_parameters=importdata('WangModelSineWaveSimulatedParameters.mat');
+    model_type = 27;
+    cd ..
+end
+
 if strcmp(model,'fink')==1
     cd ParameterSets/
     simulated_parameters=importdata('FinkModelSimulatedParameters.mat');

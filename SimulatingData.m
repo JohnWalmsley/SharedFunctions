@@ -37,12 +37,12 @@ end
 cd ..
 % For non-sine wave protocol the protocol is also passed as additional parameters, avoiding detailed protocol description in Mex function
 ProtocolLength = (length(V)/10);
-if strcmp(protocol,'sine_wave')==1 || strcmp(protocol, 'sine_wave_hh')==1
+if strcmp(protocol,'sine_wave')==1 || strcmp(protocol, 'sine_wave_hh')==1 || strcmp(protocol, 'sine_wave_wang')==1
     
     protocol_number=1;
 end
 
-if strcmp(protocol,'ap')==1
+if strcmp(protocol,'ap')==1||strcmp(protocol,'ap_wang')==1
     protocol_number=7;
     cd Protocols
     vv=importdata('ap_protocol.mat');
