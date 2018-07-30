@@ -24,8 +24,11 @@ There are also two Mex files that are used that additionally calculate parameter
 Compiled versions of all mex files are also included. If any changes to Mex files are made these must be recompiled using:
 
 `mex -I/path_to_CVODE/include -L/path_to_CVODE/lib -lsundials_nvecserial -lsundials_cvode MexFilename.c`
+
 or
+
 `mex -I/path_to_CVODE/include -L/path_to_CVODE/lib -lsundials_nvecserial -lsundials_cvodes MexFilenameSens.c`
+
 as appropriate.
 
 
@@ -38,9 +41,9 @@ as appropriate.
 
 #### Processing data
 
-[CalculateDiscrepancy.m]: (CalculateDiscrepancy.m) Given string identifying a cell and a protocol, and a vector containing a (simulated) current, calculates the discrepancy between simulation and experiment.
+[CalculateDiscrepancy.m](CalculateDiscrepancy.m): Given string identifying a cell and a protocol, and a vector containing a (simulated) current, calculates the discrepancy between simulation and experiment.
 
-[CalculateImposedVoltage.m]: (CalculateImposedVoltage.m) Given a string identifying a protocol and a time constant, generates a modified protocol that represents the delay in the amplifier and so in theory should allow a more accurate comparison between simulation and experiment. In practice these effects were negligible and so were not pursued as a source of discrepancy (although they can  be important for INa!).
+[CalculateImposedVoltage.m](CalculateImposedVoltage.m): Given a string identifying a protocol and a time constant, generates a modified protocol that represents the delay in the amplifier and so in theory should allow a more accurate comparison between simulation and experiment. In practice these effects were negligible and so were not pursued as a source of discrepancy (although they can  be important for INa!).
 
 [CorrectLeakCurrent.m](CorrectLeakCurrent.m): Removes the leak current from an experimental data trace. This file is no longer used as this approach can lead to strange behaviour in the activation step. See [LeakSubtractor.m](https://github.com/JohnWalmsley/Kylie-Sine-Wave-Data/blob/master/LeakSubtractor.m) for a reproduction of Kylie Beattie's approach.
 
